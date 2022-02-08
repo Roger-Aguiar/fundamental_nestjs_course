@@ -1,30 +1,34 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { CoffeeService } from 'src/service/coffee/coffee.service';
 
 @Controller('coffees')
 export class CoffeesController {
+    constructor(private readonly coffeeService: CoffeeService) {}
+
     @Get()
-    findAll(): string{
-        return "This action returns all coffees!";
+    findAll(@Query() paginationQuery){
+        //const {limit, offset} = paginationQuery;
+        return this.coffeeService.findAll();
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string): string{
-        return `This action returns the coffee number ${id}`;
+    findOne(@Param('id') id: string){
+        return this.coffeeService.findOne(id);
     }
 
     @Post()
     create(@Body() body){
-        return body;
+        return this.coffeeService.create(body);
     }
 
     @Put(':id')
     update(@Param('id') id: string, @Body() body){
-        return `This action updates coffee number ${id}.`;
+        return this.coffeeService.update(id, body);
     }
 
     @Delete(':id')
     delete(@Param('id') id: string){
-        return `This action deletes the coffee number ${id}`;
+        return this.coffeeService.remove(id);
     }
-    //Next video lesson: Implement Pagination with Query Parameters
+    //Next video lesson: Send User-Friendly Error Messages
 }
