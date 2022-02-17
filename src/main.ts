@@ -4,7 +4,13 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  //Validation
+  app.useGlobalPipes(new ValidationPipe({
+    //The following code prevents the app of adding non existing property in the dto
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,//It transforms a payload into a DTO instance
+  }));
   await app.listen(3000);
 }
 bootstrap();
