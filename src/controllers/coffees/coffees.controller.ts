@@ -31,5 +31,5 @@ export class CoffeesController {
     delete(@Param('id') id: string){
         return this.coffeeService.remove(id);
     }
-    //Next video lesson: Send User-Friendly Error Messages
+    //Next video lesson: Validate Input Data with Data Transfer Objects
 }
