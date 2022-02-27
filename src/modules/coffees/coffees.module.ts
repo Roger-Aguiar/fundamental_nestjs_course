@@ -8,6 +8,7 @@ import { CoffeeService } from 'src/service/coffee/coffee.service';
 @Module({
     imports: [TypeOrmModule.forFeature([Coffee, Flavor])],
     controllers: [CoffeesController],
-    providers: [CoffeeService]
+    providers: [CoffeeService],
+    exports: [CoffeeService]
 })
 export class CoffeesModule { }

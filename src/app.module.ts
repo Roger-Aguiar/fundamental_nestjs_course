@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CoffeesModule } from './modules/coffees/coffees.module';
+import { CoffeeRatingModule } from './modules/coffee-rating/coffee-rating.module';
+import { CoffeeRatingService } from './service/coffee-rating/coffee-rating.service';
 
 @Module({
   imports: [CoffeesModule,
@@ -17,8 +19,9 @@ import { CoffeesModule } from './modules/coffees/coffees.module';
       autoLoadEntities: true,
       synchronize: true,//Remember to enable this property to "false" when putting the application in production.
     }),
+    CoffeeRatingModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CoffeeRatingService],
 })
 export class AppModule { }
