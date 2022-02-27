@@ -10,6 +10,9 @@ async function bootstrap() {
     whitelist: true,
     forbidNonWhitelisted: true,
     transform: true,//It transforms a payload into a DTO instance
+    transformOptions: {
+      enableImplicitConversion: true,
+    }
   }));
   await app.listen(3000);
 }

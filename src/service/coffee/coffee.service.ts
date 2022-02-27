@@ -1,44 +1,56 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CoffeeDto } from 'src/dto/coffee/coffee.dto';
+import { PaginationQueryDto } from 'src/dto/commomn/pagination-query.dto';
 import { Coffee } from 'src/entities/coffee/coffee.entity';
+import { Flavor } from 'src/entities/flavors/flavor.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class CoffeeService {
-    private coffees: Coffee[] = [
-        {
-            id: 1,
-            name: 'Shipwreck Roast',
-            brand: 'Buddy Brew',
-            flavors: ['chocolate', 'vanilla'],
-        },
-    ];
-
-    findAll() {
-        return this.coffees;
+    constructor(
+        @InjectRepository(Coffee) private readonly coffeeRepository: Repository<Coffee>,
+        @InjectRepository(Flavor) private readonly flavorRepository: Repository<Flavor>) {}
+    
+    findAll(paginationQuery: PaginationQueryDto) {
+        const {limit, offset} = paginationQuery;
+        return this.coffeeRepository.find({relations: ['flavors'], skip: offset, take: limit,});
     }
 
-    findOne(id: string) {
-        const coffee = this.coffees.find(item => item.id === +id);
+    async findOne(id: string) {        
+        const coffee = await this.coffeeRepository.findOne(id, {relations: ['flavors'],});
         if(!coffee){
             throw new NotFoundException(`Sorry! Coffee with id ${id} was not found. Check the one and try again.`);
         }
         return coffee;
     }
 
-    create(createCoffeeDto: any) {
-        this.coffees.push(createCoffeeDto);
+    async create(createCoffeeDto: CoffeeDto) {
+        const flavors = await Promise.all(createCoffeeDto.flavors.map(name => this.preloadFlavorByName(name)),);
+        const coffee = this.coffeeRepository.create({...createCoffeeDto, flavors,});
+        return this.coffeeRepository.save(coffee);
     }
 
-    update(id: string, updateCoffeeDto: any) {
-        const existingCoffee = this.findOne(id);
-        if(existingCoffee){
-            //Update here
+    async update(id: string, updateCoffeeDto: CoffeeDto) {
+        const flavors = updateCoffeeDto.flavors && (await Promise.all(updateCoffeeDto.flavors.map(name => this.preloadFlavorByName(name)),));        
+        const coffee = await this.coffeeRepository.preload({id: +id, ...updateCoffeeDto, flavors,});
+
+        if(!coffee){
+            throw new NotFoundException(`Coffee ${id} not found!`);
         }
+        return this.coffeeRepository.save(coffee);
     }
 
-    remove(id: string) {
-        const coffeeIndex = this.coffees.findIndex(item => item.id === +id);
-        if(coffeeIndex >= 0){
-            this.coffees.splice(coffeeIndex, 1);
+    async remove(id: string) {
+        const coffee = await this.coffeeRepository.findOne(id);
+        return this.coffeeRepository.remove(coffee);
+    }
+
+    private async preloadFlavorByName(name: string): Promise<Flavor>{
+        const existingFlavor = await this.flavorRepository.findOne({name});
+        if(existingFlavor){
+            return existingFlavor;
         }
+        return this.flavorRepository.create({name});
     }
 }
