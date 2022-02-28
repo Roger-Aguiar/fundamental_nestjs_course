@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoffeeDto } from 'src/dto/coffee/coffee.dto';
 import { PaginationQueryDto } from 'src/dto/commomn/pagination-query.dto';
-import { Coffee } from 'src/entities/coffee/coffee.entity';
-import { Flavor } from 'src/entities/flavors/flavor.entity';
+import { Coffee } from '../../entities/coffee/coffee.entity';
+import { Flavor } from '../../entities/flavors/flavor.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

@@ -1,12 +1,16 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { CoffeeDto } from 'src/dto/coffee/coffee.dto';
-import { PaginationQueryDto } from 'src/dto/commomn/pagination-query.dto';
-import { CoffeeService } from 'src/service/coffee/coffee.service';
+import { ApiForbiddenResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { CoffeeDto } from '../../dto/coffee/coffee.dto';
+import { PaginationQueryDto } from '../../dto/commomn/pagination-query.dto';
+import { CoffeeService } from '../../service/coffee/coffee.service';
 
+@ApiTags('Coffees')
 @Controller('coffees')
 export class CoffeesController {
     constructor(private readonly coffeeService: CoffeeService) {}
 
+    @ApiUnauthorizedResponse({description: "Unauthorized"})
+    @ApiForbiddenResponse({description: "Forbidden"})
     @Get()
     findAll(@Query() paginationQuery: PaginationQueryDto){        
         return this.coffeeService.findAll(paginationQuery);
